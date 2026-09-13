@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welpenplan – Laineys Wurf</title>
+<style>
+  :root{
+    --bg:#EEF2EA; --paper:#FBFCFA; --ink:#1E2F27; --muted:#66756B;
+    --line:#D6DED4; --green:#2F5D48; --honey:#E0A526; --honey-soft:#FBF1D6;
+    --rose:#B94A48; --rose-soft:#F7E3E1; --done:#9AA89F;
+  }
+  *{box-sizing:border-box}
+  html{background:var(--bg)}
+  body{margin:0;font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);line-height:1.5;font-size:16px}
+  main{max-width:680px;margin:0 auto;padding:20px 16px 64px}
+  h1{font-size:1.15rem;font-weight:600;margin:0 0 4px}
+  h2{font-size:1.25rem;font-weight:700;margin:40px 0 12px;letter-spacing:-.01em}
+  p{margin:.4em 0}
+  .sub{color:var(--muted);font-size:.9rem}
+
+  /* Hero */
+  .hero{background:var(--paper);border-radius:14px;padding:20px 18px 16px;box-shadow:0 1px 0 var(--line)}
+  .age{font-size:2.6rem;font-weight:800;line-height:1;letter-spacing:-.03em;margin:12px 0 2px}
+  .age small{font-size:1rem;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:6px}
+  .phase-now{margin:6px 0 16px;font-size:1rem}
+  .phase-now b{color:var(--green)}
+  .ruler{position:relative;height:56px;margin:8px 0 6px}
+  .ruler .track{position:absolute;left:0;right:0;top:26px;height:6px;background:var(--line);border-radius:3px}
+  .ruler .seg{position:absolute;top:26px;height:6px}
+  .ruler .tick{position:absolute;top:36px;font-size:.7rem;color:var(--muted);transform:translateX(-50%)}
+  .ruler .today{position:absolute;top:4px;transform:translateX(-50%);text-align:center}
+  .ruler .today .pin{width:14px;height:14px;border-radius:50%;background:var(--honey);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--honey);margin:14px auto 0}
+  .ruler .today .lbl{font-size:.72rem;font-weight:700;color:#8a6410;white-space:nowrap}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.75rem;color:var(--muted);margin-top:10px}
+  .legend span::before{content:"";display:inline-block;width:10px;height:6px;border-radius:3px;margin-right:5px;vertical-align:middle;background:var(--c)}
+  .datebox{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:.9rem}
+  .datebox input{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  .datebox input:focus{outline:2px solid var(--honey);outline-offset:1px}
+
+  /* Next up */
+  .next{margin-top:14px;background:var(--honey-soft);border-radius:12px;padding:12px 14px}
+  .next h3{margin:0 0 6px;font-size:.95rem;font-weight:700}
+  .next ul{margin:0;padding-left:18px}
+  .next li{margin:2px 0}
+  .next li.overdue{color:var(--rose);font-weight:600}
+
+  /* Timeline */
+  .tl{position:relative;padding-left:26px}
+  .tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .step{position:relative;padding:0 0 22px}
+  .step::before{content:"";position:absolute;left:-23px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--line)}
+  .step.past{color:var(--done)}
+  .step.past::before{background:var(--done);border-color:var(--done)}
+  .step.now::before{background:var(--honey);border-color:var(--honey);box-shadow:0 0 0 4px var(--honey-soft)}
+  .step.now .card{border-color:var(--honey);background:var(--paper)}
+  .when{font-size:.8rem;color:var(--muted);margin-bottom:2px}
+  .step.past .when{color:var(--done)}
+  .title{font-weight:700;font-size:1.02rem}
+  .card{margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:rgba(255,255,255,.55);font-size:.93rem}
+  .card b{font-weight:600}
+  .card ul{margin:4px 0 0;padding-left:18px}
+  .card li{margin:2px 0}
+
+  /* Checklist */
+  .list{list-style:none;margin:0;padding:0}
+  .list li{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+  .list input{width:18px;height:18px;margin-top:3px;accent-color:var(--green)}
+  .list .d{font-size:.8rem;color:var(--muted)}
+  .list li.due .d{color:#8a6410;font-weight:700}
+  .list li.over .d{color:var(--rose);font-weight:700}
+  .list li.past{color:var(--done)}
+  .list li.checked .t{text-decoration:line-through;color:var(--done)}
+  .src{font-size:.75rem;color:var(--muted)}
+
+  .warn{background:var(--rose-soft);border-radius:12px;padding:12px 14px;font-size:.93rem}
+  .warn b{color:var(--rose)}
+  .note{background:var(--paper);border-radius:12px;padding:12px 14px;font-size:.93rem;margin-top:10px}
+  .sources li{margin:6px 0;font-size:.9rem}
+  a{color:var(--green)}
+  footer{margin-top:32px;font-size:.78rem;color:var(--muted)}
+  @media (prefers-reduced-motion:no-preference){.step.now::before{transition:box-shadow .3s}}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <h1>Laineys Wurf – 5 Welpen</h1>
+    <div class="sub" id="born"></div>
+    <div class="age"><span id="days"></span><small id="weeks"></small></div>
+    <div class="phase-now" id="phaseNow"></div>
+
+    <div class="ruler" id="ruler"></div>
+    <div class="legend" id="legend"></div>
+
+    <div class="datebox">
+      <label for="birth">Geburtstag</label>
+      <input type="date" id="birth">
+      <span class="sub">ändert alle Daten</span>
+    </div>
+
+    <div class="next">
+      <h3>Als Nächstes dran</h3>
+      <ul id="next"></ul>
+    </div>
+  </section>
+
+  <h2>Entwicklungsphasen</h2>
+  <p class="sub">Die aktuelle Phase ist gelb markiert. Zeiträume sind Richtwerte, Welpen entwickeln sich individuell.</p>
+  <div class="tl" id="phases"></div>
+
+  <h2>Tierarzt und Pflichttermine</h2>
+  <p class="sub">Haken bleiben nur in dieser Sitzung gesetzt. Präparat und Dosierung legt der Tierarzt nach Gewicht fest – vor jeder Entwurmung wiegen.</p>
+  <ul class="list" id="med"></ul>
+
+  <h2>Was die Welpen lernen können</h2>
+  <p class="sub">Alles spielerisch, kurz und ohne Zwang. Die laufende Woche ist gelb markiert.</p>
+  <div class="tl" id="learn"></div>
+
+  <h2>Lainey</h2>
+  <div class="note">
+    <p><b>Futter:</b> jetzt der höchste Bedarf der gesamten Aufzucht, etwa das 2–3-fache des normalen Erhaltungsbedarfs. Welpen- oder Laktationsfutter, Wasser immer frei zugänglich.</p>
+    <p><b>Gesäuge täglich abtasten:</b> heiße, harte oder gerötete Zitzen deuten auf eine Mastitis hin.</p>
+    <p><b>Entwurmung:</b> gleichzeitig mit der ersten Entwurmung der Welpen (ESCCAP).</p>
+  </div>
+  <div class="warn" style="margin-top:10px">
+    <b>Notfall Eklampsie (Milchfieber):</b> höchstes Risiko zwischen Woche 3 und 5. Zittern, Hecheln, Unruhe, steifer Gang, Krämpfe → sofort in die Tierklinik, auch nachts.
+  </div>
+
+  <h2>Alarmzeichen bei den Welpen</h2>
+  <div class="warn">
+    Gewichtsstillstand oder -verlust über 24 h · anhaltendes Schreien · kühler Körper, schlaffes Verhalten · Durchfall oder Erbrechen · ein Welpe liegt abseits vom Wurf. Bei jedem Punkt: Tierarzt anrufen.
+  </div>
+
+  <h2>Quellen</h2>
+  <ul class="sources">
+    <li><b>Entwurmung:</b> ESCCAP Deutschland, Empfehlung Nr. 1 „Bekämpfung von Würmern (Helminthen) bei Hunden und Katzen" (Stand 08/2025) – <a href="https://www.esccap.de/parasiten/wuermer/wie-oft-hunde-entwurmen/">esccap.de</a></li>
+    <li><b>Impfungen:</b> StIKo Vet am Friedrich-Loeffler-Institut, „Impfleitlinie für Kleintiere" (Stand 06.01.2025) – <a href="https://www.tieraerzteverband.de/bpt/berufspolitik/leitlinien/dokumente/impfleitlinien/Impfleitlinie_Kleintiere_2025-01-06.pdf">PDF beim bpt</a></li>
+    <li><b>Abgabealter:</b> Tierschutz-Hundeverordnung (TierSchHuV) § 2 Abs. 4 – <a href="https://www.buzer.de/gesetz/6312/a87656.htm">Gesetzestext</a></li>
+    <li><b>Entwicklungsphasen und Sozialisierung:</b> Scott &amp; Fuller, „Genetics and the Social Behavior of the Dog" (1965, Grundlagenstudie zu den sensiblen Phasen); MSD/Merck Veterinary Manual, Kapitel „Behavior of Dogs" und „Care of Orphaned Puppies".</li>
+    <li><b>Eklampsie, Mastitis, Neonatalpflege:</b> MSD/Merck Veterinary Manual, Kapitel „Puerperal Hypocalcemia" und „Management of the Neonate".</li>
+    <li><b>Mikrochip:</b> Voraussetzung für den EU-Heimtierausweis und die dort eingetragene Tollwutimpfung (EU-Verordnung 576/2013).</li>
+    <li><b>Hinweis:</b> Die Faustregel „1 Minute Spaziergang pro Lebenswoche" stammt aus der Trainerpraxis und ist nicht durch Studien belegt – grobe Orientierung, keine Regel.</li>
+  </ul>
+
+  <footer>Alle Termine werden aus dem eingetragenen Geburtsdatum berechnet. Die Seite ersetzt keine tierärztliche Beratung.</footer>
+</main>
+
+<script>
+(function(){
+  const DAY = 86400000;
+  const fmt = d => d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const fmtS = d => d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+  const addDays = (d,n) => new Date(d.getTime()+n*DAY);
+  const dateStr = d => d.toISOString().slice(0,10);
+  const todayMid = () => { const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); };
+
+  // --- Daten -------------------------------------------------------------
+  const phases = [
+    {from:0, to:13, name:'Neonatale Phase', c:'#8FA89A',
+     happens:'Blind und taub, keine eigene Wärmeregulation, Mutter stimuliert Kot- und Urinabsatz. Gewicht sollte sich in der ersten Woche etwa verdoppeln.',
+     todo:['Täglich wiegen und notieren','Nesttemperatur 26–28 °C, Zugluft vermeiden','Krallen ab Tag 10 kürzen (schützt das Gesäuge)']},
+    {from:13, to:21, name:'Übergangsphase', c:'#7A9E8C',
+     happens:'Augen öffnen sich (Tag 10–16), Gehörgänge öffnen sich (Tag 14–18), erste Milchzähne, erste wacklige Schritte, Welpen lösen sich selbst.',
+     todo:['Leise Alltagsgeräusche zulassen','Erste weiche Spielzeuge in die Wurfkiste','Temperatur langsam auf ~24 °C senken','Nest vergrößern, Schlaf- und Lösebereich trennen']},
+    {from:21, to:35, name:'Sozialisierung beginnt', c:'#5F8E78',
+     happens:'Spiel mit den Geschwistern, Beißhemmung wird gelernt, erstes Bellen und Knurren, Welpentoilette wird angenommen.',
+     todo:['Beifüttern mit Welpenbrei ab Woche 3–4','Wurfkiste öffnen, Auslauf vergrößern','Tägliches Handling: Pfoten, Ohren, Maul, Bauch']},
+    {from:35, to:56, name:'Prägephase', c:'#3E7A5E',
+     happens:'Die lernintensivste Zeit im Hundeleben. Was jetzt positiv kennengelernt wird, bleibt. Entwöhnung von der Muttermilch (Woche 6–8).',
+     todo:['Viele verschiedene Menschen (Kinder, Männer, Hüte, Brillen)','Untergründe, Geräusche, Gegenstände, kurze Autofahrten','Kurze Trennungen vom Wurf üben','Tierarztbesuche positiv verknüpfen']},
+    {from:56, to:70, name:'Erste Angstphase', c:'#2F5D48',
+     happens:'Welpen reagieren plötzlich schreckhafter auf Neues. Schlechte Erfahrungen prägen sich jetzt besonders tief ein.',
+     todo:['Nichts erzwingen, keine Überforderung','Abgabe idealerweise nach Woche 9','Ruhige, positive Routinen beibehalten']},
+    {from:70, to:112, name:'Sozialisierungsfenster schließt sich', c:'#244A39',
+     happens:'Bis etwa Woche 12–16 lassen sich neue Reize noch leicht einbauen, danach wird es deutlich mühsamer.',
+     todo:['Beim neuen Besitzer: Welpengruppe, Umweltgewöhnung fortsetzen','Grundimmunisierung abschließen']},
+  ];
+
+  const med = [
+    {day:14,  t:'1. Entwurmung – Welpen und Lainey gleichzeitig', s:'ESCCAP: Beginn mit 2 Wochen, dann alle 14 Tage'},
+    {day:28,  t:'2. Entwurmung', s:'ESCCAP'},
+    {day:42,  t:'3. Entwurmung', s:'ESCCAP'},
+    {day:49,  t:'Mikrochip setzen, Gesundheitscheck jedes Welpen', s:'Chip ist Voraussetzung für EU-Heimtierausweis und Tollwutimpfung; Woche 7–8'},
+    {day:56,  t:'4. Entwurmung', s:'ESCCAP; Tierarzt entscheidet, ob am selben Tag wie die Impfung oder um ein paar Tage versetzt'},
+    {day:56,  t:'1. Impfung: Parvovirose, Staupe, Leptospirose (+ HCC)', s:'StIKo Vet 2025; bei hohem Infektionsdruck im Bestand auf Woche 6 vorziehbar'},
+    {day:56,  t:'Wurfabnahme durch den Zuchtwart, Ahnentafeln', s:'nur bei Zucht im Verein (VDH o. ä.)'},
+    {day:57,  t:'Ab jetzt dürfen Welpen abgegeben werden', s:'TierSchHuV § 2 Abs. 4: erst im Alter von über 8 Wochen'},
+    {day:70,  t:'Letzte Entwurmung nach Welpenschema (2 Wochen nach dem Absetzen)', s:'ESCCAP; danach monatlich bis zum 6. Lebensmonat'},
+    {day:84,  t:'2. Impfung: Parvovirose, Staupe, Leptospirose (+ HCC), Tollwut', s:'StIKo Vet 2025 – meist schon beim neuen Besitzer'},
+    {day:112, t:'3. Impfung: Parvovirose, Staupe (+ HCC, Tollwut)', s:'StIKo Vet 2025'},
+    {day:456, t:'Abschluss der Grundimmunisierung (15 Monate)', s:'StIKo Vet 2025'},
+  ];
+
+  const learn = [
+    {w:2, items:['Berührung an Pfoten, Ohren, Maul – täglich kurz','Geruch verschiedener Menschen']},
+    {w:3, items:['Untergründe: Teppich, Fliesen, Gitter, Folie, Rasen','Leise Geräuschkulisse (Radio, Staubsauger im Nebenraum)','Welpentoilette anbieten']},
+    {w:4, items:['Fressen aus dem Napf','Spielzeug, Tunnel, kleine Hindernisse','Erste Besucher']},
+    {w:5, items:['Auf den Namen reagieren','Krallenschneiden und Bürsten als Routine','Kurz allein oder getrennt vom Wurf']},
+    {w:6, items:['Halsband tragen','Kurze Autofahrten (nüchtern)','Wenige Treppenstufen','„Sitz" spielerisch über Futterlocken']},
+    {w:7, items:['Leine erst nachschleifen lassen, dann kurz führen','Rückruf im Garten','Tierarztbesuch als positives Erlebnis','Kontakt zu geimpften, welpenfreundlichen Hunden']},
+    {w:8, items:['Stadt- und Umweltreize dosiert','Alleinbleiben in kleinen Schritten steigern','Stubenreinheit: nach Schlafen, Fressen, Spielen rausgehen']},
+  ];
+
+  // --- Render ------------------------------------------------------------
+  const $ = id => document.getElementById(id);
+
+  function getBirth(){
+    const m = location.hash.match(/geburt=(\d{4}-\d{2}-\d{2})/);
+    const v = m ? m[1] : '2026-08-30';
+    const [y,mo,d] = v.split('-').map(Number);
+    return new Date(y,mo-1,d);
+  }
+
+  function render(){
+    const birth = getBirth();
+    const today = todayMid();
+    const age = Math.round((today-birth)/DAY);
+    const week = Math.floor(age/7);
+
+    $('birth').value = dateStr(birth);
+    $('born').textContent = 'Geboren am ' + fmt(birth) + ' · heute ist ' + fmt(today);
+    $('days').textContent = 'Tag ' + age;
+    $('weeks').textContent = 'Woche ' + week + ' (' + (age%7) + '. Tag der Woche)';
+
+    const cur = phases.find(p => age>=p.from && age<p.to);
+    $('phaseNow').innerHTML = cur
+      ? 'Aktuelle Phase: <b>' + cur.name + '</b>'
+      : (age<0 ? 'Geburt steht noch bevor' : 'Sozialisierungsphase abgeschlossen – Junghundezeit');
+
+    // Wochenlineal 0–16
+    const MAX = 112;
+    const r = $('ruler'); r.innerHTML = '<div class="track"></div>';
+    phases.forEach(p => {
+      const s = document.createElement('div'); s.className='seg';
+      s.style.left = (p.from/MAX*100)+'%'; s.style.width = ((Math.min(p.to,MAX)-p.from)/MAX*100)+'%';
+      s.style.background = p.c; s.style.borderRadius = '3px';
+      r.appendChild(s);
+    });
+    [0,2,4,6,8,10,12,14,16].forEach(w => {
+      const t = document.createElement('div'); t.className='tick';
+      t.style.left=(w*7/MAX*100)+'%'; t.textContent = w===0?'Geburt':w+' Wo'; r.appendChild(t);
+    });
+    if (age>=0 && age<=MAX){
+      const m = document.createElement('div'); m.className='today';
+      m.style.left=(age/MAX*100)+'%';
+      m.innerHTML='<div class="lbl">Heute</div><div class="pin"></div>'; r.appendChild(m);
+    }
+    $('legend').innerHTML = phases.map(p=>'<span style="--c:'+p.c+'">'+p.name+'</span>').join('');
+
+    // Phasen-Timeline
+    $('phases').innerHTML = phases.map(p => {
+      const st = age>=p.to ? 'past' : (age>=p.from ? 'now' : '');
+      return '<div class="step '+st+'">'
+        + '<div class="when">Tag '+p.from+'–'+p.to+' · '+fmtS(addDays(birth,p.from))+' bis '+fmtS(addDays(birth,p.to))+'</div>'
+        + '<div class="title">'+p.name+'</div>'
+        + '<div class="card"><b>Was passiert:</b> '+p.happens
+        + '<ul>'+p.todo.map(x=>'<li>'+x+'</li>').join('')+'</ul></div></div>';
+    }).join('');
+
+    // Termine
+    const nextList = [];
+    $('med').innerHTML = med.map((m,i) => {
+      const d = addDays(birth,m.day); const diff = m.day-age;
+      let st = diff<0 ? 'past' : (diff<=3 ? 'due' : '');
+      if (diff<0 && diff>=-7) st='over';
+      let label = fmt(d);
+      if (diff===0) label='Heute · '+label;
+      else if (diff>0 && diff<=3) label='In '+diff+(diff===1?' Tag':' Tagen')+' · '+label;
+      else if (diff<0 && diff>=-7) label='Seit '+(-diff)+(diff===-1?' Tag':' Tagen')+' fällig · '+label;
+      if (diff>=-7 && diff<=21) nextList.push({diff,text:m.t,label});
+      return '<li class="'+st+'" data-i="'+i+'"><input type="checkbox" aria-label="erledigt"><div><div class="d">'+label+' · Tag '+m.day+'</div><div class="t">'+m.t+'</div><div class="src">'+m.s+'</div></div></li>';
+    }).join('');
+    $('med').querySelectorAll('input').forEach(cb => cb.addEventListener('change', e => e.target.closest('li').classList.toggle('checked', e.target.checked)));
+
+    nextList.sort((a,b)=>a.diff-b.diff);
+    $('next').innerHTML = nextList.length
+      ? nextList.slice(0,4).map(n=>'<li class="'+(n.diff<0?'overdue':'')+'">'+n.text+' <span class="src">('+n.label+')</span></li>').join('')
+      : '<li>In den nächsten drei Wochen steht kein Pflichttermin an.</li>';
+
+    // Lernen
+    $('learn').innerHTML = learn.map(l => {
+      const isNow = week===l.w || (l.w===8 && week>8 && week<16);
+      const st = week>l.w && !(l.w===8 && week<16) ? 'past' : (isNow ? 'now' : '');
+      return '<div class="step '+st+'"><div class="when">Ab Woche '+l.w+(l.w===8?'+':'')+' · ab '+fmtS(addDays(birth,l.w*7))+'</div>'
+        + '<div class="card"><ul style="margin-top:0">'+l.items.map(x=>'<li>'+x+'</li>').join('')+'</ul></div></div>';
+    }).join('');
+  }
+
+  $('birth').addEventListener('change', e => {
+    if (e.target.value) { location.hash = 'geburt=' + e.target.value; }
+  });
+  window.addEventListener('hashchange', render);
+  render();
+})();
+</script>
+</body>
+</html>
